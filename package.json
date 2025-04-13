@@ -1,0 +1,24 @@
+{
+    "name": "spa-with-cognito",
+    "version": "0.0.1",
+    "description": "SPA with AWS Cognito authentication in a monorepo structure",
+    "private": true,
+    "workspaces": [
+        "frontend",
+        "backend",
+        "backend/cdk"
+    ],
+    "scripts": {
+        "install:all": "npm install && npm run install:frontend && npm run install:backend",
+        "install:frontend": "cd frontend && npm install",
+        "install:backend": "cd backend && cd cdk && npm install",
+        "start:frontend": "cd frontend && npm start",
+        "build:frontend": "cd frontend && npm run build",
+        "deploy:backend": "cd backend/cdk && npm run cdk deploy",
+        "test": "npm run test:frontend && npm run test:backend",
+        "test:frontend": "cd frontend && npm test",
+        "test:backend": "cd backend/cdk && npm test"
+    },
+    "author": "",
+    "license": "ISC"
+}

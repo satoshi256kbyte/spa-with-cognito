@@ -1,0 +1,15 @@
+{../cdk/dist../cdk../cdk/bin/**/*.ts../cdk/lib/**/*.ts../cdk/test/**/*.ts../cdk/node_modules
+  "compilerOptions": {
+    "target": "ES2018",
+    "module": "commonjs",
+    "lib": ["es2018"],
+    "outDir": "dist",
+    "rootDir": ".",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["bin/**/*.ts", "lib/**/*.ts", "test/**/*.ts"],
+  "exclude": ["node_modules"]
+}

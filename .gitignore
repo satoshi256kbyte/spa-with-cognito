@@ -1,0 +1,71 @@
+# Root level .gitignore
+
+# General
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+
+# Editor/IDE
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+*.sublime-project
+*.sublime-workspace
+
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# AWS CDK specific
+.cdk.staging/
+cdk.out/
+cdk.context.json
+.cdk-outputs/
+
+# Testing
+coverage/
+.nyc_output/
+
+# Logs
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# macOS specific
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# Misc
+.cache/
+.temp/
+.tmp/
+tmp/
+temp/
+
+# AWS Lambda packages
+*.zip
+
+# AWS Amplify
+amplify/
+aws-exports.js
+awsconfiguration.json
+amplifyconfiguration.json
+amplify-build-config.json
+amplify-gradle-config.json
+
+# Local Netlify folder
+.netlify
