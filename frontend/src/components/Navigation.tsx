@@ -4,11 +4,8 @@ import { useAuthenticator } from '@aws-amplify/ui-react';
 
 const Navigation: React.FC = () => {
   const location = useLocation();
-  const { route, signOut } = useAuthenticator((context) => [
-    context.route,
-    context.signOut,
-  ]);
-  
+  const { route, signOut } = useAuthenticator(context => [context.route, context.signOut]);
+
   const isAuthenticated = route === 'authenticated';
 
   return (
@@ -20,8 +17,8 @@ const Navigation: React.FC = () => {
           </Link>
         </li>
         <li>
-          <Link 
-            to="/protected" 
+          <Link
+            to="/protected"
             style={{ fontWeight: location.pathname === '/protected' ? 'bold' : 'normal' }}
           >
             保護されたページ
@@ -29,15 +26,15 @@ const Navigation: React.FC = () => {
         </li>
         {isAuthenticated ? (
           <li style={{ marginLeft: 'auto' }}>
-            <button 
+            <button
               onClick={signOut}
-              style={{ 
-                padding: '5px 10px', 
-                background: '#f44336', 
+              style={{
+                padding: '5px 10px',
+                background: '#f44336',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
-                cursor: 'pointer'
+                cursor: 'pointer',
               }}
             >
               ログアウト
@@ -45,14 +42,14 @@ const Navigation: React.FC = () => {
           </li>
         ) : (
           <li style={{ marginLeft: 'auto' }}>
-            <Link 
-              to="/" 
-              style={{ 
+            <Link
+              to="/"
+              style={{
                 textDecoration: 'none',
-                padding: '5px 10px', 
-                background: '#4CAF50', 
+                padding: '5px 10px',
+                background: '#4CAF50',
                 color: 'white',
-                borderRadius: '4px'
+                borderRadius: '4px',
               }}
             >
               ログイン

@@ -53,7 +53,7 @@ export const awsConfig = {
     oauth: {
       domain: 'YOUR_COGNITO_DOMAIN', // バックエンドデプロイ後の出力値
       // ...その他の設定...
-    }
+    },
   },
   API: {
     endpoints: [
@@ -63,12 +63,13 @@ export const awsConfig = {
         // ...その他の設定...
       },
       // ...その他のエンドポイント...
-    ]
-  }
+    ],
+  },
 };
 ```
 
 以下の値を更新してください：
+
 - `userPoolId`: Cognitoユーザープールの識別子
 - `userPoolWebClientId`: ユーザープールクライアントの識別子
 - `domain`: Cognitoのホストされたログインページのドメイン
@@ -151,11 +152,13 @@ aws s3 sync build/ s3://your-app-bucket-name --acl public-read
 ### よくある問題と解決策
 
 1. **認証エラー**:
+
    - バックエンドが正しくデプロイされていることを確認
    - `aws-config.ts`の設定値が正しいことを確認
    - Cognitoユーザープールのアプリクライアント設定でコールバックURLが正確に設定されていることを確認
 
 2. **API呼び出しエラー**:
+
    - APIエンドポイントURLが正しいことを確認
    - 認証が正常に行われていることを確認
    - CORSが適切に設定されていることを確認

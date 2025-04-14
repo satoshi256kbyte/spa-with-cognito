@@ -1,4 +1,4 @@
-{../cdk/dist../cdk../cdk/bin/**/*.ts../cdk/lib/**/*.ts../cdk/test/**/*.ts../cdk/node_modules
+{
   "compilerOptions": {
     "target": "ES2018",
     "module": "commonjs",

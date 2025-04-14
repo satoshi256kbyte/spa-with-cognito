@@ -10,23 +10,23 @@ export const awsConfig = {
       scope: ['openid'],
       redirectSignIn: 'http://localhost:3000/',
       redirectSignOut: 'http://localhost:3000/',
-      responseType: 'code'
-    }
+      responseType: 'code',
+    },
   },
   API: {
     endpoints: [
       {
         name: 'mainApi',
         endpoint: 'YOUR_API_ENDPOINT', // This will be filled after deploying the backend
-        region: 'ap-northeast-1' // Update this to your AWS region
+        region: 'ap-northeast-1', // Update this to your AWS region
       },
       {
         name: 'secondApi',
         endpoint: 'YOUR_SECOND_API_ENDPOINT', // This will be filled after deploying the backend
-        region: 'ap-northeast-1' // Update this to your AWS region
-      }
-    ]
-  }
+        region: 'ap-northeast-1', // Update this to your AWS region
+      },
+    ],
+  },
 };
 
 /**

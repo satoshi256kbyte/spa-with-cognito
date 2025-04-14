@@ -6,13 +6,14 @@
 
 ```
 backend/
-├── src/                # バックエンドAPIのソースコード
-│   └── api-handler.js  # Lambda関数のハンドラー
-├── cdk/                # AWS CDKインフラコード
-│   ├── bin/            # CDKアプリケーションのエントリポイント
-│   ├── lib/            # CDKスタック定義
-│   ├── test/           # テストコード
-│   └── ...
+├── bin/                # CDKアプリケーションのエントリポイント
+│   └── cdk-project.ts  # CDKアプリのメインエントリポイント
+├── lib/                # CDKスタック定義
+│   ├── cdk-project-stack.ts  # メインCDKスタック
+│   └── lambda-handler/ # Lambda関数のソースコード
+│       └── api-handler.ts    # APIハンドラー関数
+├── test/               # テストコード
+│   └── cdk-project.test.ts
 └── README.md           # このファイル
 ```
 
@@ -66,18 +67,6 @@ npx cdk deploy -c service-name=my-spa -c stage-name=prod
 このコマンドは、CloudFormationスタックを使用してすべてのリソースをAWSにデプロイします。
 各リソースは `{ServiceName}-{StageName}-AWSサービス名-リソース名` の命名規則で作成されます。
 例えば、prod環境のCognitoユーザープールは `my-spa-prod-cognito-user-pool` のような名前になります。
-
-デプロイが完了すると、以下のような出力が表示されます：
-
-- **ServiceName**: デプロイに使用されたサービス名
-- **StageName**: デプロイに使用されたステージ名
-- **UserPoolId**: Cognitoユーザープールの識別子
-- **UserPoolClientId**: ユーザープールクライアントの識別子
-- **UserPoolDomain**: Cognitoのホストされたログインページのドメイン
-- **ApiEndpoint**: API GatewayのエンドポイントURL
-- **ProtectedEndpoint**: 認証が必要なエンドポイントURL
-- **SecondApiEndpoint**: 2つ目のAPIエンドポイント
-- **SecondProtectedEndpoint**: 2つ目の認証が必要なエンドポイント
 
 これらの値は、フロントエンドアプリケーションの設定に使用します。
 
@@ -135,7 +124,3 @@ npx cdk diff
 3. 正しいAWSプロファイルとリージョンが設定されていることを確認
 
 CDKのバージョンに関連する問題が発生した場合は、グローバルとローカルのCDKバージョンが互換性があることを確認してください。
-
----
-
-最終更新日: 2025年4月13日
