@@ -32,15 +32,15 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "husky": "^9.1.7",
-    "lint-staged": "^15.5.1",
     "@typescript-eslint/eslint-plugin": "^8.29.1",
     "@typescript-eslint/parser": "^8.29.1",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^10.1.2",
+    "eslint-config-react-app": "^7.0.1",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.2.6",
-    "eslint-config-react-app": "^7.0.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.1",
     "prettier": "^3.5.3"
   },
   "lint-staged": {
@@ -51,5 +51,9 @@
     "*.{md,json}": [
       "prettier --write"
     ]
+  },
+  "dependencies": {
+    "react-scripts": "^5.0.1",
+    "webpack": "^5.99.5"
   }
 }
