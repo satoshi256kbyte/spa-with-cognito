@@ -20,7 +20,7 @@
         "test": "npm run test:frontend && npm run test:backend",
         "test:frontend": "cd frontend && npm test",
         "test:backend": "cd backend && npm test",
-        "prepare": "husky install",
+        "prepare": "[ -z \"$VERCEL\" ] && husky install || echo \"Skipping husky in Vercel environment\"",
         "lint": "npm run lint:frontend && npm run lint:backend",
         "lint:fix": "npm run lint:fix:frontend && npm run lint:fix:backend",
         "lint:frontend": "eslint frontend --ext .ts,.tsx",
