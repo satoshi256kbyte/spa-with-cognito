@@ -12,7 +12,7 @@
     "cdk:deploy": "cdk deploy --verbose --debug"
   },
   "engines": {
-    "node": "^20.0.0"
+    "node": "^20.0.0 || ^22.0.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.4",
