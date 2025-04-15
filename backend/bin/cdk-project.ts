@@ -27,5 +27,4 @@ new CdkProjectStack(app, `${serviceName}-${stageName}-stack`, {
   // スタックにカスタムプロパティを追加
   serviceName: serviceName,
   stageName: stageName,
-  domainPrefix: domainPrefix,
 });
