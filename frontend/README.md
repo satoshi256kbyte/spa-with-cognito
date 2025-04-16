@@ -14,10 +14,11 @@ frontend/
 │   ├── index.tsx       # エントリーポイント
 │   ├── components/     # 再利用可能なコンポーネント
 │   │   └── Navigation.tsx  # ナビゲーションコンポーネント
-│   ├── config/         # 設定ファイル
-│   │   └── aws-config.ts   # AWS Amplify設定
+│   ├── context/        # Reactコンテキスト
 │   └── pages/          # ページコンポーネント
 │       ├── Home.tsx    # ホームページ
+│       ├── About.tsx   # アバウトページ
+│       ├── Member.tsx  # メンバーページ
 │       └── Protected.tsx # 保護されたページ
 ├── package.json        # 依存関係と設定
 ├── tsconfig.json       # TypeScript設定
@@ -40,42 +41,7 @@ cd frontend
 npm install
 ```
 
-### 2. AWS設定の更新
-
-バックエンドをデプロイした後、CDKスタックの出力値を使用して `src/config/aws-config.ts` ファイルを更新します。
-
-```typescript
-export const awsConfig = {
-  Auth: {
-    region: 'ap-northeast-1', // あなたのAWSリージョン
-    userPoolId: 'YOUR_USER_POOL_ID', // バックエンドデプロイ後の出力値
-    userPoolWebClientId: 'YOUR_USER_POOL_CLIENT_ID', // バックエンドデプロイ後の出力値
-    oauth: {
-      domain: 'YOUR_COGNITO_DOMAIN', // バックエンドデプロイ後の出力値
-      // ...その他の設定...
-    },
-  },
-  API: {
-    endpoints: [
-      {
-        name: 'mainApi',
-        endpoint: 'YOUR_API_ENDPOINT', // バックエンドデプロイ後の出力値
-        // ...その他の設定...
-      },
-      // ...その他のエンドポイント...
-    ],
-  },
-};
-```
-
-以下の値を更新してください：
-
-- `userPoolId`: Cognitoユーザープールの識別子
-- `userPoolWebClientId`: ユーザープールクライアントの識別子
-- `domain`: Cognitoのホストされたログインページのドメイン
-- `endpoint`: API GatewayのエンドポイントURL
-
-### 3. 開発サーバーの起動
+### 2. 開発サーバーの起動
 
 ローカル開発サーバーを起動します：
 
@@ -89,25 +55,8 @@ npm start
 
 このフロントエンドアプリケーションは、バックエンドサービスと連携するように設計されています。主な連携ポイントは以下の通りです：
 
-1. **認証**: AWS Amplifyを使用してCognitoユーザープールと連携し、認証機能を提供します。
-2. **API呼び出し**: AWS Amplifyの`API`モジュールを使用して、保護されたAPIエンドポイントにリクエストを送信します。
-
-例えば、保護されたリソースにアクセスするコードは以下のようになります：
-
-```typescript
-import { API } from 'aws-amplify';
-
-// 保護されたリソースの取得
-async function fetchProtectedResource() {
-  try {
-    const response = await API.get('mainApi', '/protected', {});
-    return response;
-  } catch (error) {
-    console.error('Error fetching protected resource:', error);
-    throw error;
-  }
-}
-```
+1. **認証**: AWS Cognitoによる認証機能を提供します。
+2. **API呼び出し**: バックエンドAPIエンドポイントにリクエストを送信します。
 
 ## ビルドとデプロイ
 
@@ -154,7 +103,7 @@ aws s3 sync build/ s3://your-app-bucket-name --acl public-read
 1. **認証エラー**:
 
    - バックエンドが正しくデプロイされていることを確認
-   - `aws-config.ts`の設定値が正しいことを確認
+   - 認証設定が正しいことを確認
    - Cognitoユーザープールのアプリクライアント設定でコールバックURLが正確に設定されていることを確認
 
 2. **API呼び出しエラー**:
@@ -182,8 +131,8 @@ aws s3 sync build/ s3://your-app-bucket-name --acl public-read
 
 - 新しいページは `src/pages` ディレクトリに追加
 - 共通コンポーネントは `src/components` ディレクトリに追加
-- 認証関連の処理は AWS Amplify の機能を利用
+- 認証関連の処理は適切な認証メカニズムを利用
 
 ---
 
-最終更新日: 2025年4月13日
+最終更新日: 2025年4月16日
