@@ -10,9 +10,7 @@ const Home: React.FC<HomeProps> = ({ isLoggedIn, onSignIn, onSignOut }) => {
   return (
     <div style={{ padding: '20px' }}>
       <h1>TOPページ</h1>
-      <p>
-        このアプリケーションはシンプルな画面遷移を実装したシングルページアプリケーションです。
-      </p>
+      <p>このアプリケーションはシンプルな画面遷移を実装したシングルページアプリケーションです。</p>
 
       {isLoggedIn ? (
         <div style={{ marginTop: '20px' }}>

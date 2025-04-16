@@ -6,7 +6,14 @@ const MemberProfile: React.FC = () => {
       <h1>プロフィールページ</h1>
       <p>こちらはメンバー専用のプロフィールページです。</p>
       <p>このページはログインが必要です。</p>
-      <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '5px' }}>
+      <div
+        style={{
+          marginTop: '20px',
+          padding: '15px',
+          backgroundColor: '#f5f5f5',
+          borderRadius: '5px',
+        }}
+      >
         <h3>ユーザー情報</h3>
         <p>名前: 山田 太郎</p>
         <p>メール: example@example.com</p>

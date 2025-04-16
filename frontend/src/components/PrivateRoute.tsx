@@ -9,7 +9,6 @@ interface PrivateRouteProps {
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ isLoggedIn, children }) => {
-
   if (isLoggedIn) {
     // 既にログインしている場合は、子コンポーネントを表示
     return <>{children}</>;

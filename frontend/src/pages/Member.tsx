@@ -9,7 +9,7 @@ interface MemberProps {
 
 const Member: React.FC<MemberProps> = ({ isLoggedIn }) => {
   const location = useLocation();
-  
+
   // ログインしていない場合はトップページにリダイレクト
   if (!isLoggedIn) {
     return <Navigate to="/" />;
@@ -26,35 +26,35 @@ const Member: React.FC<MemberProps> = ({ isLoggedIn }) => {
           <h1>メンバーエリア</h1>
           <p>このページはログインが必要です。</p>
           <p>ログイン済みユーザー向けの特別なコンテンツが表示されます。</p>
-          
+
           <div style={{ marginTop: '30px' }}>
             <h3>メンバーページ一覧</h3>
             <ul style={{ listStyle: 'none', padding: 0 }}>
               <li style={{ marginBottom: '10px' }}>
-                <Link 
-                  to="/member/profile" 
-                  style={{ 
+                <Link
+                  to="/member/profile"
+                  style={{
                     display: 'block',
                     padding: '10px 15px',
                     backgroundColor: '#f0f0f0',
                     borderRadius: '5px',
                     textDecoration: 'none',
-                    color: '#333'
+                    color: '#333',
                   }}
                 >
                   プロフィール
                 </Link>
               </li>
               <li>
-                <Link 
-                  to="/member/settings" 
-                  style={{ 
+                <Link
+                  to="/member/settings"
+                  style={{
                     display: 'block',
                     padding: '10px 15px',
                     backgroundColor: '#f0f0f0',
                     borderRadius: '5px',
                     textDecoration: 'none',
-                    color: '#333'
+                    color: '#333',
                   }}
                 >
                   設定
@@ -76,34 +76,34 @@ const Member: React.FC<MemberProps> = ({ isLoggedIn }) => {
       {/* メンバーエリア内のナビゲーション */}
       {!isRoot && (
         <div style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #ddd' }}>
-          <Link 
-            to="/member" 
-            style={{ 
+          <Link
+            to="/member"
+            style={{
               marginRight: '15px',
               textDecoration: 'none',
               color: '#333',
-              fontWeight: isRoot ? 'bold' : 'normal'
+              fontWeight: isRoot ? 'bold' : 'normal',
             }}
           >
             メンバーホーム
           </Link>
-          <Link 
-            to="/member/profile" 
-            style={{ 
+          <Link
+            to="/member/profile"
+            style={{
               marginRight: '15px',
               textDecoration: 'none',
               color: '#333',
-              fontWeight: isProfile ? 'bold' : 'normal'
+              fontWeight: isProfile ? 'bold' : 'normal',
             }}
           >
             プロフィール
           </Link>
-          <Link 
-            to="/member/settings" 
-            style={{ 
+          <Link
+            to="/member/settings"
+            style={{
               textDecoration: 'none',
               color: '#333',
-              fontWeight: isSettings ? 'bold' : 'normal'
+              fontWeight: isSettings ? 'bold' : 'normal',
             }}
           >
             設定
