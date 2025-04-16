@@ -76,7 +76,6 @@ npx cdk deploy -c env=dev
 
 ### 6. スタックの削除（不要になった場合）
 
-
 ```bash
 npx cdk destroy -c env=dev
 ```
