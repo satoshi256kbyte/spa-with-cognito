@@ -9,15 +9,38 @@ import { Construct } from 'constructs';
 interface CdkProjectStackProps extends cdk.StackProps {
   serviceName?: string;
   stageName?: string;
+  callbackUrls?: string[];
+  logoutUrls?: string[];
 }
 
 export class CdkProjectStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: CdkProjectStackProps) {
     super(scope, id, props);
 
-    // パラメータ
-    const serviceName = props?.serviceName || 'spa-cognito';
-    const stageName = props?.stageName || 'dev';
+    const serviceName =
+      this.node.tryGetContext('serviceName') || props?.serviceName || 'spa-cognito';
+    const stageName = this.node.tryGetContext('stageName') || props?.stageName || 'dev';
+
+    // コールバックURLとログアウトURLをcontextから取得（配列の場合はそのまま使用、文字列の場合は分割）
+    const contextCallbackUrls = this.node.tryGetContext('callbackUrls');
+    const contextLogoutUrls = this.node.tryGetContext('logoutUrls');
+
+    const callbackUrlsFromContext = Array.isArray(contextCallbackUrls)
+      ? contextCallbackUrls
+      : typeof contextCallbackUrls === 'string'
+        ? contextCallbackUrls.split(',')
+        : undefined;
+
+    const logoutUrlsFromContext = Array.isArray(contextLogoutUrls)
+      ? contextLogoutUrls
+      : typeof contextLogoutUrls === 'string'
+        ? contextLogoutUrls.split(',')
+        : undefined;
+
+    // 優先順位: Context > Props > デフォルト値
+    const callbackUrls = callbackUrlsFromContext ||
+      props?.callbackUrls || ['http://localhost:3000'];
+    const logoutUrls = logoutUrlsFromContext || props?.logoutUrls || ['http://localhost:3000'];
 
     // リソース名のベースを作成
     const resourceBase = `${serviceName}-${stageName}`;
@@ -49,8 +72,6 @@ export class CdkProjectStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
-    // ユーザープールドメインの設定部分を削除
-
     // ユーザープールクライアントの作成
     const userPoolClient = new cognito.UserPoolClient(this, 'SpaUserPoolClient', {
       userPoolClientName: `${resourceBase}-cognito-client`,
@@ -64,8 +85,8 @@ export class CdkProjectStack extends cdk.Stack {
           implicitCodeGrant: true,
         },
         scopes: [cognito.OAuthScope.OPENID],
-        callbackUrls: ['http://localhost:3000'],
-        logoutUrls: ['http://localhost:3000'],
+        callbackUrls: callbackUrls,
+        logoutUrls: logoutUrls,
       },
       preventUserExistenceErrors: true,
     });

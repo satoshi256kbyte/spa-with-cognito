@@ -1,1 +1,5 @@
 node_modules/
+
+# 実際の環境設定ファイル（テンプレートからコピーして使用）
+config/*.json
+!config/*.template

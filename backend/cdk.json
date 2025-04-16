@@ -1,4 +1,9 @@
 {
   "app": "npx ts-node bin/cdk-project.ts",
-  "context": {}
+  "context": {
+    "serviceName": "spa-cognito",
+    "stageName": "dev",
+    "callbackUrls": ["http://localhost:3000", "https://example.com"],
+    "logoutUrls": ["http://localhost:3000", "https://example.com"]
+  }
 }

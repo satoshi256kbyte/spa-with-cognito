@@ -1,0 +1,12 @@
+{
+  "serviceName": "spa-cognito",
+  "stageName": "dev",
+  "callbackUrls": [
+    "http://localhost:3000",
+    "https://dev.example.com"
+  ],
+  "logoutUrls": [
+    "http://localhost:3000",
+    "https://dev.example.com"
+  ]
+}

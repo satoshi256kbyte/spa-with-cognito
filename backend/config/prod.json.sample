@@ -1,0 +1,12 @@
+{
+  "serviceName": "spa-cognito",
+  "stageName": "prod",
+  "callbackUrls": [
+    "https://app.example.com",
+    "https://www.example.com"
+  ],
+  "logoutUrls": [
+    "https://app.example.com",
+    "https://www.example.com"
+  ]
+}
