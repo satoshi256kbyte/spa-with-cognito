@@ -1,23 +1,71 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navigate, Routes, Route, Link, useLocation } from 'react-router-dom';
 import MemberProfile from './MemberProfile';
 import MemberSettings from './MemberSettings';
+import apiConfig from '../config/api-config';
 
 interface MemberProps {
   isLoggedIn: boolean;
 }
 
+// Define interface for the API response data
+interface MemberApiResponse {
+  message: string;
+  data?: any;
+  // Add other fields as needed based on your actual API response
+}
+
 const Member: React.FC<MemberProps> = ({ isLoggedIn }) => {
   const location = useLocation();
+  // State to store API data
+  const [memberData, setMemberData] = useState<MemberApiResponse | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const isRoot = location.pathname === '/member';
+  const isProfile = location.pathname.includes('/member/profile');
+  const isSettings = location.pathname.includes('/member/settings');
+
+  // Fetch data when component mounts and user is logged in
+  useEffect(() => {
+    const fetchMemberData = async () => {
+      if (!isLoggedIn) return;
+
+      try {
+        setLoading(true);
+        // Get authentication token - you'll need to implement a method to retrieve the token
+        // This is just a placeholder - replace with your actual auth token retrieval
+        const token = localStorage.getItem('authToken');
+
+        const response = await fetch(`${apiConfig.baseUrl}${apiConfig.endpoints.member}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`API request failed with status ${response.status}`);
+        }
+
+        const data: MemberApiResponse = await response.json();
+        setMemberData(data);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching member data:', err);
+        setError('メンバーデータの取得に失敗しました。しばらく経ってからお試しください。');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMemberData();
+  }, [isLoggedIn]);
 
   // ログインしていない場合はトップページにリダイレクト
   if (!isLoggedIn) {
     return <Navigate to="/" />;
   }
-
-  const isRoot = location.pathname === '/member';
-  const isProfile = location.pathname.includes('/member/profile');
-  const isSettings = location.pathname.includes('/member/settings');
 
   return (
     <div style={{ padding: '20px' }}>
@@ -26,6 +74,39 @@ const Member: React.FC<MemberProps> = ({ isLoggedIn }) => {
           <h1>メンバーエリア</h1>
           <p>このページはログインが必要です。</p>
           <p>ログイン済みユーザー向けの特別なコンテンツが表示されます。</p>
+
+          {/* Member API Data Display Section */}
+          <div
+            style={{
+              marginTop: '20px',
+              padding: '15px',
+              backgroundColor: '#f9f9f9',
+              borderRadius: '5px',
+            }}
+          >
+            <h2>メンバーAPI データ</h2>
+            {loading ? (
+              <p>データを読み込み中です...</p>
+            ) : error ? (
+              <p style={{ color: 'red' }}>{error}</p>
+            ) : (
+              <div>
+                <p>{memberData?.message}</p>
+                {memberData?.data && (
+                  <pre
+                    style={{
+                      background: '#eee',
+                      padding: '10px',
+                      borderRadius: '4px',
+                      overflow: 'auto',
+                    }}
+                  >
+                    {JSON.stringify(memberData.data, null, 2)}
+                  </pre>
+                )}
+              </div>
+            )}
+          </div>
 
           <div style={{ marginTop: '30px' }}>
             <h3>メンバーページ一覧</h3>
