@@ -51,34 +51,11 @@ npm run deploy:backend
 - Cognito クライアントID
 - API Gateway エンドポイント
 
-これらの値を `frontend/src/config/aws-config.ts` ファイルに設定する必要があります。
-
 ### Cognitoユーザープールドメインの設定
 
 このプロジェクトでは、CDKデプロイ後に**AWSコンソールから手動で**Cognitoユーザープールドメインを設定する必要があります。これはホスト型UI（Cognitoの標準ログイン画面）を使用するために必要なステップです。
 
 設定後のドメインURLは `https://[プレフィックス].auth.[リージョン].amazoncognito.com` の形式になります。
-このドメインURLはフロントエンドの設定ファイルにも追加する必要があります。
-
-#### ドメイン設定後のフロントエンド設定
-
-ドメインを設定した後、フロントエンドの設定ファイル `frontend/src/config/aws-config.ts` に以下の情報を追加してください：
-
-```typescript
-// frontend/src/config/aws-config.ts の例
-export const awsConfig = {
-  region: 'ap-northeast-1', // AWSリージョン
-  userPoolId: 'ap-northeast-1_xxxxxxxxx', // デプロイ後に出力されたユーザープールID
-  userPoolWebClientId: 'xxxxxxxxxxxxxxxxxxxxxxxxxx', // デプロイ後に出力されたクライアントID
-  oauth: {
-    domain: 'your-domain-prefix.auth.ap-northeast-1.amazoncognito.com', // 手動で設定したドメイン
-    scope: ['email', 'openid', 'profile'],
-    redirectSignIn: 'http://localhost:3000/',
-    redirectSignOut: 'http://localhost:3000/',
-    responseType: 'code',
-  },
-};
-```
 
 注意：ドメイン設定はCDKで自動化することも技術的には可能ですが、名前の一意性などの問題によりデプロイが失敗することがあるため、本プロジェクトでは手動設定を採用しています。
 
@@ -133,7 +110,7 @@ npm run test:backend
 │   └── src/             # ソースコード
 │       ├── components/  # 再利用可能なコンポーネント
 │       ├── pages/       # ページコンポーネント
-│       └── config/      # アプリケーションの設定
+│       └── context/     # Reactコンテキスト
 └── backend/             # バックエンドアプリケーション
     ├── package.json     # バックエンドの依存関係
     ├── bin/             # CDKアプリケーションのエントリーポイント
