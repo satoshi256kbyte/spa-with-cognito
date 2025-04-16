@@ -56,7 +56,7 @@ const Home: React.FC<HomeProps> = ({ isLoggedIn, onSignIn, onSignOut }) => {
         console.info('HTTP API endpoint started');
         setMemberLoading(true);
         const token = localStorage.getItem('authToken');
-        console.info(token);
+        console.info('Token obtained from localStorage:', token ? 'Valid token' : 'No token');
         const response = await fetch(apiConfig.endpoints.member, {
           headers: {
             Authorization: `Bearer ${token || ''}`,
