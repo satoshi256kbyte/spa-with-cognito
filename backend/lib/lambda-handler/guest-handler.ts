@@ -1,11 +1,12 @@
-// filepath: /Users/Satoshi/Development/swx/5_local/spa-with-cognito/backend/src/api-handler.ts
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 
+// ゲスト用ハンドラー（認証不要）
 export const handler = async (
   event: APIGatewayProxyEvent,
   context: Context // eslint-disable-line @typescript-eslint/no-unused-vars
 ): Promise<APIGatewayProxyResult> => {
-  console.log('Event: ', JSON.stringify(event, null, 2));
+  console.log('Guest Request: ', JSON.stringify(event, null, 2));
+
   return {
     statusCode: 200,
     headers: {
@@ -15,8 +16,13 @@ export const handler = async (
       'Access-Control-Allow-Headers': 'Content-Type,Authorization',
     },
     body: JSON.stringify({
-      message: 'Hello from Lambda!',
-      requestContext: event.requestContext,
+      message: 'こんにちは、ゲストさん！',
+      timestamp: new Date().toISOString(),
+      path: event.path,
+      publicData: {
+        appInfo: '認証なしでアクセスできる公開情報です',
+        status: 'active',
+      },
     }),
   };
 };

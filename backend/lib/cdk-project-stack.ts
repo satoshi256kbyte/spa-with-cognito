@@ -91,12 +91,11 @@ export class CdkProjectStack extends cdk.Stack {
       preventUserExistenceErrors: true,
     });
 
-    // API用のNodejsLambda関数を作成 - TypeScriptでコンパイル
-    const apiFunction = new nodejslambda.NodejsFunction(this, 'ApiFunction', {
-      functionName: `${resourceBase}-lambda-api-handler`,
+    const guestApiFunction = new nodejslambda.NodejsFunction(this, 'GuestApiFunction', {
+      functionName: `${resourceBase}-lambda-guest-api-handler`,
       runtime: lambda.Runtime.NODEJS_18_X,
       code: lambda.Code.fromAsset('lib/lambda-handler'),
-      handler: 'api-handler.handler',
+      handler: 'guest-handler.handler',
       environment: {
         USER_POOL_ID: userPool.userPoolId,
         CLIENT_ID: userPoolClient.userPoolClientId,
@@ -105,12 +104,11 @@ export class CdkProjectStack extends cdk.Stack {
       },
     });
 
-    // 2つ目のAPI用NodejsLambda関数を作成 - TypeScriptでコンパイル
-    const secondApiFunction = new nodejslambda.NodejsFunction(this, 'SecondApiFunction', {
-      functionName: `${resourceBase}-lambda-second-api-handler`,
+    const memberApiFunction = new nodejslambda.NodejsFunction(this, 'MemberApiFunction', {
+      functionName: `${resourceBase}-lambda-member-api-handler`,
       runtime: lambda.Runtime.NODEJS_18_X,
       code: lambda.Code.fromAsset('lib/lambda-handler'),
-      handler: 'api-handler.handler',
+      handler: 'member-handler.handler',
       environment: {
         USER_POOL_ID: userPool.userPoolId,
         CLIENT_ID: userPoolClient.userPoolClientId,
@@ -119,17 +117,17 @@ export class CdkProjectStack extends cdk.Stack {
       },
     });
 
-    // Cognitoオーソライザー
-    const auth = new apigateway.CognitoUserPoolsAuthorizer(this, 'ApiAuthorizer', {
+    // ゲストAPI用のCognitoオーソライザー
+    const guestApiAuthorizer = new apigateway.CognitoUserPoolsAuthorizer(this, 'ApiAuthorizer', {
       authorizerName: `${resourceBase}-apigw-authorizer`,
       cognitoUserPools: [userPool],
       identitySource: 'method.request.header.Authorization',
     });
 
-    // API Gateway REST APIの作成
-    const api = new apigateway.RestApi(this, 'SpaApi', {
-      restApiName: `${resourceBase}-apigw-main-api`,
-      description: `API for ${serviceName} (${stageName}) with Cognito authentication`,
+    // ゲスト用のAPI Gateway REST APIの作成
+    const guestApi = new apigateway.RestApi(this, 'GuestApi', {
+      restApiName: `${resourceBase}-apigw-guest-api`,
+      description: `Guest API for ${serviceName} (${stageName}) - No authentication required`,
       defaultCorsPreflightOptions: {
         allowOrigins: apigateway.Cors.ALL_ORIGINS,
         allowMethods: apigateway.Cors.ALL_METHODS,
@@ -138,19 +136,19 @@ export class CdkProjectStack extends cdk.Stack {
     });
 
     // ルートリソースにGETメソッドを追加 (認証なし)
-    api.root.addMethod('GET', new apigateway.LambdaIntegration(apiFunction));
+    guestApi.root.addMethod('GET', new apigateway.LambdaIntegration(guestApiFunction));
 
-    // 保護されたリソースの追加
-    const protectedResource = api.root.addResource('protected');
-    protectedResource.addMethod('GET', new apigateway.LambdaIntegration(apiFunction), {
-      authorizer: auth,
+    // ゲストAPIの保護されたリソースの追加
+    const guestProtectedResource = guestApi.root.addResource('protected');
+    guestProtectedResource.addMethod('GET', new apigateway.LambdaIntegration(guestApiFunction), {
+      authorizer: guestApiAuthorizer,
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });
 
-    // 2つ目のAPI Gateway REST APIの作成
-    const secondApi = new apigateway.RestApi(this, 'SecondSpaApi', {
-      restApiName: `${resourceBase}-apigw-second-api`,
-      description: `Second API for ${serviceName} (${stageName}) with Cognito authentication`,
+    // メンバー用のAPI Gateway REST APIの作成
+    const memberApi = new apigateway.RestApi(this, 'MemberApi', {
+      restApiName: `${resourceBase}-apigw-member-api`,
+      description: `Member API for ${serviceName} (${stageName}) with Cognito authentication`,
       defaultCorsPreflightOptions: {
         allowOrigins: apigateway.Cors.ALL_ORIGINS,
         allowMethods: apigateway.Cors.ALL_METHODS,
@@ -158,20 +156,24 @@ export class CdkProjectStack extends cdk.Stack {
       },
     });
 
-    // 2つ目のAPI用のオーソライザーを作成（同じユーザープールを使用）
-    const secondAuth = new apigateway.CognitoUserPoolsAuthorizer(this, 'SecondApiAuthorizer', {
-      authorizerName: `${resourceBase}-apigw-second-authorizer`,
-      cognitoUserPools: [userPool],
-      identitySource: 'method.request.header.Authorization',
-    });
+    // メンバーAPI用のオーソライザーを作成（同じユーザープールを使用）
+    const memberApiAuthorizer = new apigateway.CognitoUserPoolsAuthorizer(
+      this,
+      'SecondApiAuthorizer',
+      {
+        authorizerName: `${resourceBase}-apigw-second-authorizer`,
+        cognitoUserPools: [userPool],
+        identitySource: 'method.request.header.Authorization',
+      }
+    );
 
-    // 2つ目のAPIのルートリソースにGETメソッドを追加 (認証なし)
-    secondApi.root.addMethod('GET', new apigateway.LambdaIntegration(secondApiFunction));
+    // メンバーAPIのルートリソースにGETメソッドを追加 (認証なし)
+    memberApi.root.addMethod('GET', new apigateway.LambdaIntegration(memberApiFunction));
 
-    // 2つ目のAPIの保護されたリソースの追加
-    const secondProtectedResource = secondApi.root.addResource('protected');
-    secondProtectedResource.addMethod('GET', new apigateway.LambdaIntegration(secondApiFunction), {
-      authorizer: secondAuth,
+    // メンバーAPIの保護されたリソースの追加
+    const memberProtectedResource = memberApi.root.addResource('protected');
+    memberProtectedResource.addMethod('GET', new apigateway.LambdaIntegration(memberApiFunction), {
+      authorizer: memberApiAuthorizer,
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });
 
@@ -197,25 +199,25 @@ export class CdkProjectStack extends cdk.Stack {
       description: '作成されたCognitoユーザープールクライアントのID',
     });
 
-    new cdk.CfnOutput(this, 'ApiEndpoint', {
-      value: api.url,
-      description: 'API GatewayのエンドポイントURL',
+    new cdk.CfnOutput(this, 'GuestApiEndpoint', {
+      value: guestApi.url,
+      description: 'ゲスト用APIエンドポイント（認証不要）',
     });
 
-    new cdk.CfnOutput(this, 'ProtectedEndpoint', {
-      value: `${api.url}protected`,
-      description: 'Cognito認証で保護されたAPI GatewayのエンドポイントURL',
+    new cdk.CfnOutput(this, 'ProtectedGuestEndpoint', {
+      value: `${guestApi.url}protected`,
+      description: 'ゲストAPI内の保護されたエンドポイント（認証必要）',
     });
 
     // 2つ目のAPIの出力
-    new cdk.CfnOutput(this, 'SecondApiEndpoint', {
-      value: secondApi.url,
-      description: '2つ目のAPI GatewayのエンドポイントURL',
+    new cdk.CfnOutput(this, 'MemberApiEndpoint', {
+      value: memberApi.url,
+      description: 'メンバー用APIエンドポイント',
     });
 
-    new cdk.CfnOutput(this, 'SecondProtectedEndpoint', {
-      value: `${secondApi.url}protected`,
-      description: '2つ目のCognito認証で保護されたAPI GatewayのエンドポイントURL',
+    new cdk.CfnOutput(this, 'ProtectedMemberEndpoint', {
+      value: `${memberApi.url}protected`,
+      description: 'メンバー用APIの保護されたエンドポイント（認証必要）',
     });
   }
 }
