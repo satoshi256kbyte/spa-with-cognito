@@ -1,16 +1,18 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useAuthenticator } from '@aws-amplify/ui-react';
 
-const Navigation: React.FC = () => {
+interface NavigationProps {
+  isLoggedIn: boolean;
+  onSignIn: () => void;
+  onSignOut: () => void;
+}
+
+const Navigation: React.FC<NavigationProps> = ({ isLoggedIn, onSignIn, onSignOut }) => {
   const location = useLocation();
-  const { route, signOut } = useAuthenticator(context => [context.route, context.signOut]);
-
-  const isAuthenticated = route === 'authenticated';
 
   return (
     <nav style={{ padding: '20px', borderBottom: '1px solid #ccc' }}>
-      <ul style={{ display: 'flex', listStyle: 'none', gap: '20px' }}>
+      <ul style={{ display: 'flex', listStyle: 'none', gap: '20px', margin: 0 }}>
         <li>
           <Link to="/" style={{ fontWeight: location.pathname === '/' ? 'bold' : 'normal' }}>
             ホーム
@@ -18,16 +20,26 @@ const Navigation: React.FC = () => {
         </li>
         <li>
           <Link
-            to="/protected"
-            style={{ fontWeight: location.pathname === '/protected' ? 'bold' : 'normal' }}
+            to="/about"
+            style={{ fontWeight: location.pathname === '/about' ? 'bold' : 'normal' }}
           >
-            保護されたページ
+            About
           </Link>
         </li>
-        {isAuthenticated ? (
-          <li style={{ marginLeft: 'auto' }}>
+        {isLoggedIn && (
+          <li>
+            <Link
+              to="/member"
+              style={{ fontWeight: location.pathname === '/member' ? 'bold' : 'normal' }}
+            >
+              Member
+            </Link>
+          </li>
+        )}
+        <li style={{ marginLeft: 'auto' }}>
+          {isLoggedIn ? (
             <button
-              onClick={signOut}
+              onClick={onSignOut}
               style={{
                 padding: '5px 10px',
                 background: '#f44336',
@@ -37,25 +49,24 @@ const Navigation: React.FC = () => {
                 cursor: 'pointer',
               }}
             >
-              ログアウト
+              Sign out
             </button>
-          </li>
-        ) : (
-          <li style={{ marginLeft: 'auto' }}>
-            <Link
-              to="/"
+          ) : (
+            <button
+              onClick={onSignIn}
               style={{
-                textDecoration: 'none',
                 padding: '5px 10px',
                 background: '#4CAF50',
                 color: 'white',
+                border: 'none',
                 borderRadius: '4px',
+                cursor: 'pointer',
               }}
             >
-              ログイン
-            </Link>
-          </li>
-        )}
+              Sign in
+            </button>
+          )}
+        </li>
       </ul>
     </nav>
   );

@@ -1,24 +1,51 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { Authenticator } from '@aws-amplify/ui-react';
-import '@aws-amplify/ui-react/styles.css';
 import Home from './pages/Home';
-import Protected from './pages/Protected';
+import About from './pages/About';
+import Member from './pages/Member';
 import Navigation from './components/Navigation';
 
 const App: React.FC = () => {
+  // 簡易的なログイン状態管理（Cognitoの代わり）
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+
+  // ログイン処理
+  const handleSignIn = () => {
+    setIsLoggedIn(true);
+  };
+
+  // ログアウト処理
+  const handleSignOut = () => {
+    setIsLoggedIn(false);
+  };
+
   return (
-    <Authenticator.Provider>
-      <div className="app">
-        <Navigation />
-        <main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/protected" element={<Protected />} />
-          </Routes>
-        </main>
-      </div>
-    </Authenticator.Provider>
+    <div className="app">
+      <Navigation 
+        isLoggedIn={isLoggedIn} 
+        onSignIn={handleSignIn} 
+        onSignOut={handleSignOut}
+      />
+      <main>
+        <Routes>
+          <Route 
+            path="/" 
+            element={
+              <Home 
+                isLoggedIn={isLoggedIn} 
+                onSignIn={handleSignIn} 
+                onSignOut={handleSignOut}
+              />
+            } 
+          />
+          <Route path="/about" element={<About />} />
+          <Route 
+            path="/member" 
+            element={<Member isLoggedIn={isLoggedIn} />} 
+          />
+        </Routes>
+      </main>
+    </div>
   );
 };
 

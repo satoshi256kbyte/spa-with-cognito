@@ -1,39 +1,58 @@
 import React from 'react';
-import { Authenticator } from '@aws-amplify/ui-react';
 
-const Home: React.FC = () => {
+interface HomeProps {
+  isLoggedIn: boolean;
+  onSignIn: () => void;
+  onSignOut: () => void;
+}
+
+const Home: React.FC<HomeProps> = ({ isLoggedIn, onSignIn, onSignOut }) => {
   return (
     <div style={{ padding: '20px' }}>
-      <h1>SPA with Cognito - ホームページ</h1>
+      <h1>SPA - ホームページ</h1>
       <p>
-        このアプリケーションはAWS
-        Cognitoを使用した認証機能を持つシングルページアプリケーションです。
+        このアプリケーションはシンプルな画面遷移を実装したシングルページアプリケーションです。
       </p>
 
-      <div style={{ marginTop: '20px' }}>
-        <h2>認証が必要なコンテンツ</h2>
-        <Authenticator>
-          {({ signOut }) => (
-            <div>
-              <p>ログインに成功しました！このコンテンツは認証済みユーザーのみ閲覧できます。</p>
-              <button
-                onClick={signOut}
-                style={{
-                  marginTop: '10px',
-                  padding: '5px 10px',
-                  background: '#f44336',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                }}
-              >
-                ログアウト
-              </button>
-            </div>
-          )}
-        </Authenticator>
-      </div>
+      {isLoggedIn ? (
+        <div style={{ marginTop: '20px' }}>
+          <h2>ログイン済みコンテンツ</h2>
+          <p>ログイン状態です。Member ページにアクセスできます。</p>
+          <button
+            onClick={onSignOut}
+            style={{
+              marginTop: '10px',
+              padding: '5px 10px',
+              background: '#f44336',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+            }}
+          >
+            ログアウト
+          </button>
+        </div>
+      ) : (
+        <div style={{ marginTop: '20px' }}>
+          <h2>未ログインコンテンツ</h2>
+          <p>ログインするとさらに多くの機能にアクセスできます。</p>
+          <button
+            onClick={onSignIn}
+            style={{
+              marginTop: '10px',
+              padding: '5px 10px',
+              background: '#4CAF50',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+            }}
+          >
+            ログイン
+          </button>
+        </div>
+      )}
     </div>
   );
 };
