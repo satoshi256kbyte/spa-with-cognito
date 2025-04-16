@@ -53,15 +53,17 @@ const Home: React.FC<HomeProps> = ({ isLoggedIn, onSignIn, onSignOut }) => {
   useEffect(() => {
     const fetchMemberData = async () => {
       try {
+        console.info('HTTP API endpoint started');
         setMemberLoading(true);
         const token = localStorage.getItem('authToken');
-
+        console.info(token);
         const response = await fetch(apiConfig.endpoints.member, {
           headers: {
             Authorization: `Bearer ${token || ''}`,
             'Content-Type': 'application/json',
           },
         });
+        console.info(response);
 
         if (!response.ok) {
           throw new Error(`API request failed with status ${response.status}`);
@@ -70,10 +72,12 @@ const Home: React.FC<HomeProps> = ({ isLoggedIn, onSignIn, onSignOut }) => {
         const data: MemberApiResponse = await response.json();
         setMemberData(data);
         setMemberError(null);
+
+        console.info('HTTP API endpoint succeeded');
       } catch (err) {
         console.error('Error fetching member data:', err);
         setMemberError(
-          'メンバーAPI認証エラー: メンバーデータにアクセスするにはログインが必要です。'
+          'API認証エラー: サインインが必要です。'
         );
       } finally {
         setMemberLoading(false);
