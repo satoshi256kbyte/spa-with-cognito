@@ -32,28 +32,39 @@ const Member: React.FC<MemberProps> = ({ isLoggedIn }) => {
         setLoading(true);
         // Amplifyから現在のセッション情報を取得する
         const { Auth } = await import('aws-amplify');
-        const session = await Auth.currentSession();
-        const token = session.getIdToken().getJwtToken();
 
-        console.log('Token obtained from Amplify:', token ? 'Valid token' : 'No token');
+        try {
+          const session = await Auth.currentSession();
+          const token = session.getIdToken().getJwtToken();
 
-        // メンバーAPIエンドポイントを使用する
-        console.log('Using API endpoint...');
-        const response = await fetch(apiConfig.endpoints.member, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
+          if (!token) {
+            throw new Error('No token available');
+          }
 
-        if (!response.ok) {
-          throw new Error(`API request failed with status ${response.status}`);
+          console.log('Token obtained from Amplify:', token ? 'Valid token' : 'No token');
+
+          // メンバーAPIエンドポイントを使用する
+          console.log('Using API endpoint...');
+          const response = await fetch(apiConfig.endpoints.member, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error(`API request failed with status ${response.status}`);
+          }
+
+          const data: MemberApiResponse = await response.json();
+          setMemberData(data);
+          setError(null);
+          console.log('HTTP API endpoint succeeded');
+        } catch (authError) {
+          console.error('Authentication error:', authError);
+          setError('認証エラーが発生しました。再度ログインしてください。');
+          // Optional: You might want to trigger a logout or redirect to login here
         }
-
-        const data: MemberApiResponse = await response.json();
-        setMemberData(data);
-        setError(null);
-        console.log('HTTP API endpoint succeeded');
       } catch (err) {
         console.error('Error fetching member data:', err);
         setError('メンバーデータの取得に失敗しました。しばらく経ってからお試しください。');
