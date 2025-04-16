@@ -8,16 +8,14 @@ interface MemberProps {
   isLoggedIn: boolean;
 }
 
-// Define interface for the API response data
 interface MemberApiResponse {
   message: string;
   data?: any;
-  // Add other fields as needed based on your actual API response
 }
 
 const Member: React.FC<MemberProps> = ({ isLoggedIn }) => {
   const location = useLocation();
-  // State to store API data
+
   const [memberData, setMemberData] = useState<MemberApiResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,18 +24,15 @@ const Member: React.FC<MemberProps> = ({ isLoggedIn }) => {
   const isProfile = location.pathname.includes('/member/profile');
   const isSettings = location.pathname.includes('/member/settings');
 
-  // Fetch data when component mounts and user is logged in
   useEffect(() => {
     const fetchMemberData = async () => {
       if (!isLoggedIn) return;
 
       try {
         setLoading(true);
-        // Get authentication token - you'll need to implement a method to retrieve the token
-        // This is just a placeholder - replace with your actual auth token retrieval
         const token = localStorage.getItem('authToken');
 
-        const response = await fetch(`${apiConfig.baseUrl}${apiConfig.endpoints.member}`, {
+        const response = await fetch(apiConfig.endpoints.member, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',

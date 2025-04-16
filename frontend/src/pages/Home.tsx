@@ -36,7 +36,7 @@ const Home: React.FC<HomeProps> = ({ isLoggedIn, onSignIn, onSignOut }) => {
     const fetchGuestData = async () => {
       try {
         setGuestLoading(true);
-        const response = await fetch(`${apiConfig.baseUrl}${apiConfig.endpoints.guest}`);
+        const response = await fetch(apiConfig.endpoints.guest);
 
         if (!response.ok) {
           throw new Error(`API request failed with status ${response.status}`);
@@ -64,7 +64,7 @@ const Home: React.FC<HomeProps> = ({ isLoggedIn, onSignIn, onSignOut }) => {
         // Get authentication token - only available if logged in
         const token = localStorage.getItem('authToken');
 
-        const response = await fetch(`${apiConfig.baseUrl}${apiConfig.endpoints.member}`, {
+        const response = await fetch(apiConfig.endpoints.member, {
           headers: {
             Authorization: `Bearer ${token || ''}`,
             'Content-Type': 'application/json',
