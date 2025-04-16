@@ -30,10 +30,15 @@ const Member: React.FC<MemberProps> = ({ isLoggedIn }) => {
 
       try {
         setLoading(true);
-        const token = localStorage.getItem('authToken');
+        // Amplifyから現在のセッション情報を取得する
+        const { Auth } = await import('aws-amplify');
+        const session = await Auth.currentSession();
+        const token = session.getIdToken().getJwtToken();
 
-        // HTTP APIエンドポイントのみを使用する
-        console.log('Using HTTP API endpoint...');
+        console.log('Token obtained from Amplify:', token ? 'Valid token' : 'No token');
+        
+        // メンバーAPIエンドポイントを使用する
+        console.log('Using API endpoint...');
         const response = await fetch(apiConfig.endpoints.member, {
           headers: {
             Authorization: `Bearer ${token}`,
