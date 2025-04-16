@@ -1,6 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 
-// ゲスト用ハンドラー（認証不要）
 export const handler = async (
   event: APIGatewayProxyEvent,
   context: Context // eslint-disable-line @typescript-eslint/no-unused-vars

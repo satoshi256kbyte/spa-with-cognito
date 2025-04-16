@@ -57,7 +57,6 @@ const Member: React.FC<MemberProps> = ({ isLoggedIn }) => {
     fetchMemberData();
   }, [isLoggedIn]);
 
-  // ログインしていない場合はトップページにリダイレクト
   if (!isLoggedIn) {
     return <Navigate to="/" />;
   }
@@ -70,7 +69,6 @@ const Member: React.FC<MemberProps> = ({ isLoggedIn }) => {
           <p>このページはログインが必要です。</p>
           <p>ログイン済みユーザー向けの特別なコンテンツが表示されます。</p>
 
-          {/* Member API Data Display Section */}
           <div
             style={{
               marginTop: '20px',
@@ -141,7 +139,6 @@ const Member: React.FC<MemberProps> = ({ isLoggedIn }) => {
         </>
       )}
 
-      {/* サブページがリクエストされた場合は、子ルートを表示 */}
       {!isRoot && (
         <Routes>
           <Route path="profile" element={<MemberProfile />} />
@@ -149,7 +146,6 @@ const Member: React.FC<MemberProps> = ({ isLoggedIn }) => {
         </Routes>
       )}
 
-      {/* メンバーエリア内のナビゲーション */}
       {!isRoot && (
         <div style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #ddd' }}>
           <Link

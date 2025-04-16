@@ -14,7 +14,6 @@ const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  // ユーザーの認証状態を確認する関数
   const checkAuthState = async () => {
     try {
       await Auth.currentAuthenticatedUser();
@@ -25,11 +24,9 @@ const App: React.FC = () => {
     }
   };
 
-  // コンポーネントマウント時に認証状態をチェック
   useEffect(() => {
     checkAuthState();
 
-    // Auth変更イベントをリッスン
     const listener = Hub.listen('auth', (data: { payload: { event: string } }) => {
       switch (data.payload.event) {
         case 'signIn':
@@ -59,13 +56,10 @@ const App: React.FC = () => {
 
   return (
     <div className="app">
-      {/* ナビゲーション */}
       <Navigation isLoggedIn={isLoggedIn} onSignIn={handleSignIn} onSignOut={handleSignOut} />
 
-      {/* メインコンテンツ */}
       <main>
         <Routes>
-          {/* 認証不要のルート */}
           <Route
             path="/"
             element={
@@ -74,10 +68,8 @@ const App: React.FC = () => {
           />
           <Route path="/about" element={<About />} />
 
-          {/* 認証ルート - 専用のLogin コンポーネントを使用 */}
           <Route path="/login" element={<Login />} />
 
-          {/* 認証が必要なルート - /member から始まるすべてのパスを保護 */}
           <Route
             path="/member/*"
             element={

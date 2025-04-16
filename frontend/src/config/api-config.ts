@@ -1,4 +1,3 @@
-// API configuration
 const apiConfig = {
   endpoints: {
     guest: process.env.REACT_APP_API_GUEST || process.env.NEXT_PUBLIC_API_GUEST || '/api/guest',

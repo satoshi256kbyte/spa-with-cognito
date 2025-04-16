@@ -7,31 +7,25 @@ interface HomeProps {
   onSignOut: () => void;
 }
 
-// Define interface for the API response data
 interface GuestApiResponse {
   message: string;
   data?: any;
-  // Add other fields as needed based on your actual API response
 }
 
 interface MemberApiResponse {
   message: string;
   data?: any;
-  // Add other fields as needed based on your actual API response
 }
 
 const Home: React.FC<HomeProps> = ({ isLoggedIn, onSignIn, onSignOut }) => {
-  // State for guest API data
   const [guestData, setGuestData] = useState<GuestApiResponse | null>(null);
   const [guestLoading, setGuestLoading] = useState<boolean>(true);
   const [guestError, setGuestError] = useState<string | null>(null);
 
-  // State for member API data
   const [memberData, setMemberData] = useState<MemberApiResponse | null>(null);
   const [memberLoading, setMemberLoading] = useState<boolean>(true);
   const [memberError, setMemberError] = useState<string | null>(null);
 
-  // Fetch guest data when component mounts
   useEffect(() => {
     const fetchGuestData = async () => {
       try {
@@ -56,12 +50,10 @@ const Home: React.FC<HomeProps> = ({ isLoggedIn, onSignIn, onSignOut }) => {
     fetchGuestData();
   }, []);
 
-  // Also try to fetch member data to show authentication error
   useEffect(() => {
     const fetchMemberData = async () => {
       try {
         setMemberLoading(true);
-        // Get authentication token - only available if logged in
         const token = localStorage.getItem('authToken');
 
         const response = await fetch(apiConfig.endpoints.member, {
@@ -89,14 +81,13 @@ const Home: React.FC<HomeProps> = ({ isLoggedIn, onSignIn, onSignOut }) => {
     };
 
     fetchMemberData();
-  }, [isLoggedIn]); // Re-run when login status changes
+  }, [isLoggedIn]);
 
   return (
     <div style={{ padding: '20px' }}>
       <h1>TOPページ</h1>
       <p>このアプリケーションはシンプルな画面遷移を実装したシングルページアプリケーションです。</p>
 
-      {/* Guest API Data Display Section */}
       <div
         style={{
           marginTop: '20px',
@@ -129,7 +120,6 @@ const Home: React.FC<HomeProps> = ({ isLoggedIn, onSignIn, onSignOut }) => {
         )}
       </div>
 
-      {/* Member API Data Display Section - Intentionally showing auth error for non-logged in users */}
       <div
         style={{
           marginTop: '20px',
