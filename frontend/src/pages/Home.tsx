@@ -52,33 +52,53 @@ const Home: React.FC<HomeProps> = ({ isLoggedIn, onSignIn, onSignOut }) => {
 
   useEffect(() => {
     const fetchMemberData = async () => {
+      if (!isLoggedIn) {
+        setMemberLoading(false);
+        setMemberError('API認証エラー: サインインが必要です。');
+        return;
+      }
+
       try {
         console.info('HTTP API endpoint started');
         setMemberLoading(true);
-        const token = localStorage.getItem('authToken');
-        console.info('Token obtained from localStorage:', token ? 'Valid token' : 'No token');
-        const response = await fetch(apiConfig.endpoints.member, {
-          headers: {
-            Authorization: `Bearer ${token || ''}`,
-            'Content-Type': 'application/json',
-          },
-        });
-        console.info(response);
+        
+        // Amplifyから現在のセッション情報を取得する
+        const { Auth } = await import('aws-amplify');
+        
+        try {
+          const session = await Auth.currentSession();
+          const token = session.getIdToken().getJwtToken();
+          
+          if (!token) {
+            throw new Error('No token available');
+          }
 
-        if (!response.ok) {
-          throw new Error(`API request failed with status ${response.status}`);
+          console.info('Token obtained from Amplify:', token ? 'Valid token' : 'No token');
+          
+          const response = await fetch(apiConfig.endpoints.member, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+          console.info(response);
+
+          if (!response.ok) {
+            throw new Error(`API request failed with status ${response.status}`);
+          }
+
+          const data: MemberApiResponse = await response.json();
+          setMemberData(data);
+          setMemberError(null);
+
+          console.info('HTTP API endpoint succeeded');
+        } catch (authError) {
+          console.error('Authentication error:', authError);
+          setMemberError('認証エラーが発生しました。再度ログインしてください。');
         }
-
-        const data: MemberApiResponse = await response.json();
-        setMemberData(data);
-        setMemberError(null);
-
-        console.info('HTTP API endpoint succeeded');
       } catch (err) {
         console.error('Error fetching member data:', err);
-        setMemberError(
-          'API認証エラー: サインインが必要です。'
-        );
+        setMemberError('メンバーデータの取得に失敗しました。しばらく経ってからお試しください。');
       } finally {
         setMemberLoading(false);
       }
