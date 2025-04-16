@@ -14,5 +14,4 @@ const awsExports = {
     'COGNITO_USER_POOL_WEB_CLIENT_ID',
 };
 
-console.log('AWS Amplify configuration:', awsExports);
 export default awsExports;
