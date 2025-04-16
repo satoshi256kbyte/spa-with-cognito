@@ -5,5 +5,5 @@ const awsExports = {
   "aws_user_pools_id": process.env.COGNITO_USER_POOL_ID || 'COGNITO_USER_POOL_ID',
   "aws_user_pools_web_client_id": process.env.COGNITO_CLIENT_ID || 'COGNITO_USER_POOL_WEB_CLIENT_ID',
 };
-
+console.log('AWS Amplify configuration:', awsExports);
 export default awsExports;
