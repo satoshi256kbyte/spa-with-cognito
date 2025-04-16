@@ -8,5 +8,6 @@
   "logoutUrls": [
     "https://app.example.com",
     "https://www.example.com"
-  ]
+  ],
+  "corsAllowCredentials": true
 }

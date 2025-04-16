@@ -1,5 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
-import * as apigateway from 'aws-cdk-lib/aws-apigateway';
+import * as httpApi from 'aws-cdk-lib/aws-apigatewayv2';
+import * as httpApiAuthorizers from 'aws-cdk-lib/aws-apigatewayv2-authorizers';
+import * as httpApiIntegrations from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as nodejslambda from 'aws-cdk-lib/aws-lambda-nodejs';
@@ -11,6 +13,8 @@ interface CdkProjectStackProps extends cdk.StackProps {
   stageName?: string;
   callbackUrls?: string[];
   logoutUrls?: string[];
+  corsOrigins?: string[];
+  corsAllowCredentials?: boolean;
 }
 
 export class CdkProjectStack extends cdk.Stack {
@@ -44,6 +48,10 @@ export class CdkProjectStack extends cdk.Stack {
 
     // リソース名のベースを作成
     const resourceBase = `${serviceName}-${stageName}`;
+
+    // CORS設定 - 確実に動作する固定値を使用
+    const corsOrigins = ['*']; // すべてのオリジンを許可
+    const corsAllowCredentials = true;
 
     // Cognitoユーザープールの作成
     const userPool = new cognito.UserPool(this, 'SpaUserPool', {
@@ -101,6 +109,8 @@ export class CdkProjectStack extends cdk.Stack {
         CLIENT_ID: userPoolClient.userPoolClientId,
         SERVICE_NAME: serviceName,
         STAGE_NAME: stageName,
+        CORS_ORIGINS: JSON.stringify(corsOrigins),
+        CORS_ALLOW_CREDENTIALS: corsAllowCredentials.toString(),
       },
     });
 
@@ -114,49 +124,79 @@ export class CdkProjectStack extends cdk.Stack {
         CLIENT_ID: userPoolClient.userPoolClientId,
         SERVICE_NAME: serviceName,
         STAGE_NAME: stageName,
+        CORS_ORIGINS: JSON.stringify(corsOrigins),
+        CORS_ALLOW_CREDENTIALS: corsAllowCredentials.toString(),
       },
     });
 
-    // ゲスト用のAPI Gateway REST APIの作成
-    const guestApi = new apigateway.RestApi(this, 'GuestApi', {
-      restApiName: `${resourceBase}-apigw-guest-api`,
-      description: `Guest API for ${serviceName} (${stageName}) - No authentication required`,
-      defaultCorsPreflightOptions: {
-        allowOrigins: apigateway.Cors.ALL_ORIGINS,
-        allowMethods: apigateway.Cors.ALL_METHODS,
-        allowHeaders: ['Content-Type', 'Authorization'],
+    // HTTP API（APIGatewayV2）の作成 - ゲスト用
+    const guestHttpApi = new httpApi.HttpApi(this, 'GuestHttpApi', {
+      apiName: `${resourceBase}-apigw-http-guest-api`,
+      description: `Guest HTTP API for ${serviceName} (${stageName}) - No authentication required`,
+      corsPreflight: {
+        allowOrigins: ['https://spa-with-cognito-frontend.vercel.app'], // フロントエンドのURLを明示的に指定
+        allowMethods: [httpApi.CorsHttpMethod.ANY], // すべてのメソッドを許可
+        allowHeaders: ['*'], // すべてのヘッダーを許可
+        allowCredentials: true,
+        maxAge: cdk.Duration.days(1), // プリフライト結果を長時間キャッシュ
       },
     });
 
-    // ルートリソースにGETメソッドを追加 (認証なし)
-    guestApi.root.addMethod('GET', new apigateway.LambdaIntegration(guestApiFunction));
+    // Lambda 統合の作成 - ゲスト用
+    const guestHttpIntegration = new httpApiIntegrations.HttpLambdaIntegration(
+      'GuestHttpIntegration',
+      guestApiFunction
+    );
 
-    // メンバー用のAPI Gateway REST APIの作成
-    const memberApi = new apigateway.RestApi(this, 'MemberApi', {
-      restApiName: `${resourceBase}-apigw-member-api`,
-      description: `Member API for ${serviceName} (${stageName}) with Cognito authentication`,
-      defaultCorsPreflightOptions: {
-        allowOrigins: apigateway.Cors.ALL_ORIGINS,
-        allowMethods: apigateway.Cors.ALL_METHODS,
-        allowHeaders: ['Content-Type', 'Authorization'],
+    // HTTP APIにエンドポイントを追加 - ゲスト用
+    guestHttpApi.addRoutes({
+      path: '/',
+      methods: [httpApi.HttpMethod.GET],
+      integration: guestHttpIntegration,
+    });
+
+    // HTTP APIにエンドポイントを追加 - ゲスト用情報エンドポイント
+    guestHttpApi.addRoutes({
+      path: '/info',
+      methods: [httpApi.HttpMethod.GET],
+      integration: guestHttpIntegration,
+    });
+
+    // HTTP API（APIGatewayV2）の作成 - メンバー用（CORS問題に対応）
+    const memberHttpApi = new httpApi.HttpApi(this, 'MemberHttpApi', {
+      apiName: `${resourceBase}-apigw-http-member-api`,
+      description: `Member HTTP API for ${serviceName} (${stageName}) with Cognito authentication`,
+      corsPreflight: {
+        allowOrigins: ['https://spa-with-cognito-frontend.vercel.app'], // フロントエンドのURLを明示的に指定
+        allowMethods: [httpApi.CorsHttpMethod.ANY], // すべてのメソッドを許可
+        allowHeaders: ['*'], // すべてのヘッダーを許可
+        allowCredentials: true,
+        maxAge: cdk.Duration.days(1), // プリフライト結果を長時間キャッシュ
       },
     });
 
-    // メンバーAPI用のオーソライザーを作成（同じユーザープールを使用）
-    const memberApiAuthorizer = new apigateway.CognitoUserPoolsAuthorizer(
-      this,
-      'MemberApiAuthorizer',
+    // Cognito オーソライザーの設定
+    const httpApiAuthorizer = new httpApiAuthorizers.HttpUserPoolAuthorizer(
+      'MemberHttpApiAuthorizer',
+      userPool,
       {
-        authorizerName: `${resourceBase}-apigw-member-authorizer`,
-        cognitoUserPools: [userPool],
-        identitySource: 'method.request.header.Authorization',
+        userPoolClients: [userPoolClient],
+        identitySource: ['$request.header.Authorization'],
       }
     );
 
-    // メンバーAPIのルートリソースにGETメソッドを追加 (認証あり)
-    memberApi.root.addMethod('GET', new apigateway.LambdaIntegration(memberApiFunction), {
-      authorizer: memberApiAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
+    // Lambda 統合の作成 - メンバー用
+    const memberHttpIntegration = new httpApiIntegrations.HttpLambdaIntegration(
+      'MemberHttpIntegration',
+      memberApiFunction
+    );
+
+    // HTTP APIにエンドポイントを追加 - メンバー用
+    memberHttpApi.addRoutes({
+      path: '/',
+      methods: [httpApi.HttpMethod.GET],
+      integration: memberHttpIntegration,
+      authorizer: httpApiAuthorizer,
     });
 
     // 出力の定義
@@ -181,20 +221,16 @@ export class CdkProjectStack extends cdk.Stack {
       description: '作成されたCognitoユーザープールクライアントのID',
     });
 
-    new cdk.CfnOutput(this, 'GuestApiEndpoint', {
-      value: guestApi.url,
-      description: 'ゲスト用APIエンドポイント（認証不要）',
+    // HTTP APIエンドポイントの出力 - ゲスト用
+    new cdk.CfnOutput(this, 'GuestHttpApiEndpoint', {
+      value: guestHttpApi.apiEndpoint,
+      description: 'ゲスト用HTTP APIエンドポイント',
     });
 
-    new cdk.CfnOutput(this, 'GuestInfoEndpoint', {
-      value: `${guestApi.url}info`,
-      description: 'ゲストAPI情報エンドポイント（認証不要）',
-    });
-
-    // 2つ目のAPIの出力
-    new cdk.CfnOutput(this, 'MemberApiEndpoint', {
-      value: memberApi.url,
-      description: 'メンバー用APIエンドポイント',
+    // HTTP APIエンドポイントの出力 - メンバー用
+    new cdk.CfnOutput(this, 'MemberHttpApiEndpoint', {
+      value: memberHttpApi.apiEndpoint,
+      description: 'メンバー用HTTP APIエンドポイント（CORS対応）',
     });
   }
 }

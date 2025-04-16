@@ -32,6 +32,8 @@ const Member: React.FC<MemberProps> = ({ isLoggedIn }) => {
         setLoading(true);
         const token = localStorage.getItem('authToken');
 
+        // HTTP APIエンドポイントのみを使用する
+        console.log('Using HTTP API endpoint...');
         const response = await fetch(apiConfig.endpoints.member, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -46,6 +48,7 @@ const Member: React.FC<MemberProps> = ({ isLoggedIn }) => {
         const data: MemberApiResponse = await response.json();
         setMemberData(data);
         setError(null);
+        console.log('HTTP API endpoint succeeded');
       } catch (err) {
         console.error('Error fetching member data:', err);
         setError('メンバーデータの取得に失敗しました。しばらく経ってからお試しください。');

@@ -8,5 +8,6 @@
   "logoutUrls": [
     "http://localhost:3000",
     "https://dev.example.com"
-  ]
+  ],
+  "corsAllowCredentials": true
 }
