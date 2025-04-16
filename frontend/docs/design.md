@@ -1,22 +1,11 @@
 # 画面構成兼遷移図
 
-## テキスト説明
-
-- (/)TOP(ログインなしでアクセス可能)
-    - 画面右上の「Sign in」ボタン
-    - CognitoのホステッドUIサインイン画面
-- (member)Member(ログイン必須)
-- (/about)About(画面上のメニューから)(ログインなしでアクセス可能)
-
-ログイン状態だとサインインリンクなし、代わりにサインアウトリンク表示
-
-## Mermaid画面遷移図
+## 画面遷移図
 
 ```mermaid
 flowchart TD
     TOP["TOP (/)
-    ログインなしでアクセス可能"] -->|Sign inボタン| COGNITO["Cognito
-    ホステッドUI"]
+    ログインなしでアクセス可能"] -->|Sign inボタン| COGNITO["Amplify UI"]
     COGNITO -->|認証成功| TOP_LOGGED["TOP (/)
     ログイン済み状態"]
     
@@ -43,3 +32,7 @@ flowchart TD
     class TOP,ABOUT public
     class MEMBER private
     class COGNITO,TOP_LOGGED auth
+
+## 参考URL
+
+https://docs.aws.amazon.com/ja_jp/prescriptive-guidance/latest/patterns/authenticate-react-app-users-cognito-amplify-ui.html
