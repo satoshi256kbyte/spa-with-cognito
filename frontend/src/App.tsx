@@ -8,7 +8,7 @@ import Navigation from './components/Navigation';
 // AWS Amplify Authentication
 import { Authenticator } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
-import { fetchAuthSession } from 'aws-amplify/auth';
+import { Auth } from 'aws-amplify';  // Using traditional import style for v5
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -16,8 +16,8 @@ const App: React.FC = () => {
   // ユーザーの認証状態を確認する関数
   const checkAuthState = async () => {
     try {
-      const session = await fetchAuthSession();
-      setIsLoggedIn(!!session.tokens);
+      const session = await Auth.currentSession();
+      setIsLoggedIn(!!session);
     } catch (error) {
       console.log('Not authenticated', error);
       setIsLoggedIn(false);
@@ -31,34 +31,40 @@ const App: React.FC = () => {
 
   return (
     <Authenticator>
-      {({ signOut, user }) => (
-        <div className="app">
-          <Navigation 
-            isLoggedIn={!!user} 
-            onSignIn={() => {}} // Amplifyが処理するため空の関数
-            onSignOut={signOut} 
-          />
-          <main>
-            <Routes>
-              <Route 
-                path="/" 
-                element={
-                  <Home 
-                    isLoggedIn={!!user} 
-                    onSignIn={() => {}} // Amplifyが処理するため空の関数
-                    onSignOut={signOut} 
-                  />
-                } 
-              />
-              <Route path="/about" element={<About />} />
-              <Route 
-                path="/member" 
-                element={<Member isLoggedIn={!!user} />} 
-              />
-            </Routes>
-          </main>
-        </div>
-      )}
+      {({ signOut, user }) => {
+        const handleSignOut = () => {
+          if (signOut) signOut();
+        };
+        
+        return (
+          <div className="app">
+            <Navigation 
+              isLoggedIn={!!user} 
+              onSignIn={() => {}}
+              onSignOut={handleSignOut}
+            />
+            <main>
+              <Routes>
+                <Route 
+                  path="/" 
+                  element={
+                    <Home 
+                      isLoggedIn={!!user} 
+                      onSignIn={() => {}}
+                      onSignOut={handleSignOut}
+                    />
+                  } 
+                />
+                <Route path="/about" element={<About />} />
+                <Route 
+                  path="/member" 
+                  element={<Member isLoggedIn={!!user} />} 
+                />
+              </Routes>
+            </main>
+          </div>
+        );
+      }}
     </Authenticator>
   );
 };
