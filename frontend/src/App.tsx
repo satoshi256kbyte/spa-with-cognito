@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import Home from './pages/Home';
 import About from './pages/About';
 import Member from './pages/Member';
+import Login from './pages/Login';
 import Navigation from './components/Navigation';
 import PrivateRoute from './components/PrivateRoute';
 
-// AWS Amplify Authentication
 import { Auth, Hub } from 'aws-amplify';
+import '@aws-amplify/ui-react/styles.css';
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   // ユーザーの認証状態を確認する関数
   const checkAuthState = async () => {
@@ -43,8 +45,7 @@ const App: React.FC = () => {
   }, []);
 
   const handleSignIn = () => {
-    // ホステッドUIにリダイレクト（または任意の認証方法）
-    Auth.federatedSignIn();
+    navigate('/login');
   };
 
   const handleSignOut = async () => {
@@ -81,6 +82,9 @@ const App: React.FC = () => {
           />
           <Route path="/about" element={<About />} />
           
+          {/* 認証ルート - 専用のLogin コンポーネントを使用 */}
+          <Route path="/login" element={<Login />} />
+
           {/* 認証が必要なルート - /member から始まるすべてのパスを保護 */}
           <Route 
             path="/member/*" 
@@ -90,6 +94,7 @@ const App: React.FC = () => {
               </PrivateRoute>
             } 
           />
+          
         </Routes>
       </main>
     </div>
