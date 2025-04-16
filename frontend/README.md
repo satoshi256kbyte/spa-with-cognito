@@ -18,8 +18,7 @@ frontend/
 │   └── pages/          # ページコンポーネント
 │       ├── Home.tsx    # ホームページ
 │       ├── About.tsx   # アバウトページ
-│       ├── Member.tsx  # メンバーページ
-│       └── Protected.tsx # 保護されたページ
+│       └─── Member.tsx  # メンバーページ
 ├── package.json        # 依存関係と設定
 ├── tsconfig.json       # TypeScript設定
 └── README.md           # このファイル
