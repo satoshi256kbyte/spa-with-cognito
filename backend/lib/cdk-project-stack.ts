@@ -94,8 +94,8 @@ export class CdkProjectStack extends cdk.Stack {
     const guestApiFunction = new nodejslambda.NodejsFunction(this, 'GuestApiFunction', {
       functionName: `${resourceBase}-lambda-guest-api-handler`,
       runtime: lambda.Runtime.NODEJS_18_X,
-      code: lambda.Code.fromAsset('lib/lambda-handler'),
-      handler: 'guest-handler.handler',
+      handler: 'index.handler',
+      entry: 'lib/lambda-handler/guest-handler.ts',
       environment: {
         USER_POOL_ID: userPool.userPoolId,
         CLIENT_ID: userPoolClient.userPoolClientId,
@@ -107,8 +107,8 @@ export class CdkProjectStack extends cdk.Stack {
     const memberApiFunction = new nodejslambda.NodejsFunction(this, 'MemberApiFunction', {
       functionName: `${resourceBase}-lambda-member-api-handler`,
       runtime: lambda.Runtime.NODEJS_18_X,
-      code: lambda.Code.fromAsset('lib/lambda-handler'),
-      handler: 'member-handler.handler',
+      handler: 'index.handler',
+      entry: 'lib/lambda-handler/member-handler.ts',
       environment: {
         USER_POOL_ID: userPool.userPoolId,
         CLIENT_ID: userPoolClient.userPoolClientId,
@@ -196,6 +196,5 @@ export class CdkProjectStack extends cdk.Stack {
       value: memberApi.url,
       description: 'メンバー用APIエンドポイント',
     });
-
   }
 }
