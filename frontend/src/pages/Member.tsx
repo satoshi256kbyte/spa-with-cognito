@@ -36,7 +36,7 @@ const Member: React.FC<MemberProps> = ({ isLoggedIn }) => {
         const token = session.getIdToken().getJwtToken();
 
         console.log('Token obtained from Amplify:', token ? 'Valid token' : 'No token');
-        
+
         // メンバーAPIエンドポイントを使用する
         console.log('Using API endpoint...');
         const response = await fetch(apiConfig.endpoints.member, {
