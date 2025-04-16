@@ -117,13 +117,6 @@ export class CdkProjectStack extends cdk.Stack {
       },
     });
 
-    // ゲストAPI用のCognitoオーソライザー
-    const guestApiAuthorizer = new apigateway.CognitoUserPoolsAuthorizer(this, 'ApiAuthorizer', {
-      authorizerName: `${resourceBase}-apigw-authorizer`,
-      cognitoUserPools: [userPool],
-      identitySource: 'method.request.header.Authorization',
-    });
-
     // ゲスト用のAPI Gateway REST APIの作成
     const guestApi = new apigateway.RestApi(this, 'GuestApi', {
       restApiName: `${resourceBase}-apigw-guest-api`,
@@ -137,13 +130,6 @@ export class CdkProjectStack extends cdk.Stack {
 
     // ルートリソースにGETメソッドを追加 (認証なし)
     guestApi.root.addMethod('GET', new apigateway.LambdaIntegration(guestApiFunction));
-
-    // ゲストAPIの保護されたリソースの追加
-    const guestProtectedResource = guestApi.root.addResource('protected');
-    guestProtectedResource.addMethod('GET', new apigateway.LambdaIntegration(guestApiFunction), {
-      authorizer: guestApiAuthorizer,
-      authorizationType: apigateway.AuthorizationType.COGNITO,
-    });
 
     // メンバー用のAPI Gateway REST APIの作成
     const memberApi = new apigateway.RestApi(this, 'MemberApi', {
@@ -159,20 +145,16 @@ export class CdkProjectStack extends cdk.Stack {
     // メンバーAPI用のオーソライザーを作成（同じユーザープールを使用）
     const memberApiAuthorizer = new apigateway.CognitoUserPoolsAuthorizer(
       this,
-      'SecondApiAuthorizer',
+      'MemberApiAuthorizer',
       {
-        authorizerName: `${resourceBase}-apigw-second-authorizer`,
+        authorizerName: `${resourceBase}-apigw-member-authorizer`,
         cognitoUserPools: [userPool],
         identitySource: 'method.request.header.Authorization',
       }
     );
 
-    // メンバーAPIのルートリソースにGETメソッドを追加 (認証なし)
-    memberApi.root.addMethod('GET', new apigateway.LambdaIntegration(memberApiFunction));
-
-    // メンバーAPIの保護されたリソースの追加
-    const memberProtectedResource = memberApi.root.addResource('protected');
-    memberProtectedResource.addMethod('GET', new apigateway.LambdaIntegration(memberApiFunction), {
+    // メンバーAPIのルートリソースにGETメソッドを追加 (認証あり)
+    memberApi.root.addMethod('GET', new apigateway.LambdaIntegration(memberApiFunction), {
       authorizer: memberApiAuthorizer,
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });
@@ -204,9 +186,9 @@ export class CdkProjectStack extends cdk.Stack {
       description: 'ゲスト用APIエンドポイント（認証不要）',
     });
 
-    new cdk.CfnOutput(this, 'ProtectedGuestEndpoint', {
-      value: `${guestApi.url}protected`,
-      description: 'ゲストAPI内の保護されたエンドポイント（認証必要）',
+    new cdk.CfnOutput(this, 'GuestInfoEndpoint', {
+      value: `${guestApi.url}info`,
+      description: 'ゲストAPI情報エンドポイント（認証不要）',
     });
 
     // 2つ目のAPIの出力
@@ -215,9 +197,5 @@ export class CdkProjectStack extends cdk.Stack {
       description: 'メンバー用APIエンドポイント',
     });
 
-    new cdk.CfnOutput(this, 'ProtectedMemberEndpoint', {
-      value: `${memberApi.url}protected`,
-      description: 'メンバー用APIの保護されたエンドポイント（認証必要）',
-    });
   }
 }
