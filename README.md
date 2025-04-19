@@ -2,107 +2,9 @@
 
 このプロジェクトは AWS Cognito 認証を活用したシングルページアプリケーション (SPA) をモノレポ構成で実装したものです。
 
-## プロジェクト構成
-
-このリポジトリはフロントエンドとバックエンドのコードを1つのリポジトリで管理するモノレポ構成になっています：
-
-- `/frontend` - React + TypeScript で実装されたSPAフロントエンド
-- `/backend` - AWS CDK で実装されたバックエンドインフラストラクチャ
-
-## 開発環境のセットアップ
-
-### 前提条件
-
-- Node.js (v16以上)
-- npm (v7以上)
-- AWS CLI（設定済み）
-- AWS CDK CLI
-
-### インストール
-
-リポジトリのルートディレクトリで以下のコマンドを実行します：
-
-```bash
-# モノレポ全体の依存関係をインストール
-npm run install:all
-```
-
-または、個別のパッケージをインストールする場合：
-
-```bash
-# フロントエンドの依存関係のみをインストール
-npm run install:frontend
-
-# バックエンドの依存関係のみをインストール
-npm run install:backend
-```
-
-## バックエンドのデプロイ
-
-AWS CDKを使用してバックエンドリソースをデプロイします：
-
-```bash
-npm run deploy:backend
-```
-
-デプロイが完了すると、以下の情報が出力されます：
-
-- Cognito ユーザープールID
-- Cognito クライアントID
-- API Gateway エンドポイント
-
-### Cognitoユーザープールドメインの設定
-
-このプロジェクトでは、CDKデプロイ後に**AWSコンソールから手動で**Cognitoユーザープールドメインを設定する必要があります。これはホスト型UI（Cognitoの標準ログイン画面）を使用するために必要なステップです。
-
-設定後のドメインURLは `https://[プレフィックス].auth.[リージョン].amazoncognito.com` の形式になります。
-
-注意：ドメイン設定はCDKで自動化することも技術的には可能ですが、名前の一意性などの問題によりデプロイが失敗することがあるため、本プロジェクトでは手動設定を採用しています。
-
-## フロントエンドの開発
-
-フロントエンド開発サーバーを起動するには：
-
-```bash
-npm run start:frontend
-```
-
-これにより、React開発サーバーが起動し、`http://localhost:3000` でアプリケーションにアクセスできます。
-
-## フロントエンドのビルド
-
-本番環境用にフロントエンドをビルドするには：
-
-```bash
-npm run build:frontend
-```
-
-ビルドされたファイルは `frontend/build` ディレクトリに出力されます。
-
-## テスト
-
-テストを実行するには：
-
-```bash
-# すべてのテストを実行
-npm test
-
-# フロントエンドのテストのみを実行
-npm run test:frontend
-
-# バックエンドのテストのみを実行
-npm run test:backend
-```
-
-## 本番環境へのデプロイ
-
-1. バックエンドをデプロイする
-2. フロントエンドをビルドする
-3. ビルドされたフロントエンドファイルをS3バケットにアップロードする（必要に応じてCloudFrontを設定）
-
 ## ディレクトリ構造
 
-```
+```shell
 ├── package.json         # モノレポのルート package.json
 ├── frontend/            # フロントエンドアプリケーション
 │   ├── package.json     # フロントエンドの依存関係
@@ -113,8 +15,99 @@ npm run test:backend
 │       └── context/     # Reactコンテキスト
 └── backend/             # バックエンドアプリケーション
     ├── package.json     # バックエンドの依存関係
-    ├── bin/             # CDKアプリケーションのエントリーポイント
+    ├── bin/             # CDKアプリケーションのエントリポイント
+    ├── config/          # 環境別設定ファイル
     ├── lib/             # CDKスタック定義
     │   └── lambda-handler/ # Lambda関数のソースコード
+    ├── src/             # ソースコード
     └── test/            # テストコード
+```
+
+## 開発環境のセットアップ
+
+### 前提条件
+
+以下のツールがインストールされていることを確認してください。
+
+- asdf（Node.jsとnpmのバージョン管理）
+- AWS CLI
+
+### インストール
+
+asdfを使用してNode.jsとnpmをインストールします。
+
+```shell
+asdf plugin add nodejs
+asdf install
+```
+
+依存関係をインストールします。
+
+```shell
+# モノレポ全体の依存関係をインストール
+npm run install:all
+```
+
+## デプロイ
+
+バックエンドのデプロイ
+AWS CDKを使用してバックエンドのリソース群をデプロイします。
+
+```shell
+npm run deploy:backend
+```
+
+本プロジェクトのフロントエンドはVercelでのデプロイを想定しています。
+したがって、フロントエンドのデプロイコマンドはありません。
+
+### Vercelへのデプロイ
+
+- 本プロジェクトをGitHubにプッシュします。
+- Vercelのプロジェクトを作成し、GitHubリポジトリを接続します。
+- VercelのプロジェクトでSettingsを開き、設定を行います。
+  - Root Directoryに`frontend`を指定します。
+  - Environment Variablesで環境変数を設定します。
+
+環境変数一覧
+| 変数名 | 説明 |
+| --- | --- |
+| `REACT_APP_REGION` | AWSリージョン |
+| `REACT_APP_USER_POOL_ID` | CognitoユーザープールID |
+| `REACT_APP_USER_POOL_WEB_CLIENT_ID` | CognitoユーザープールクライアントID |
+| `REACT_APP_API_GUEST` | 認証なしのバックエンドAPIのURL |
+| `REACT_APP_API_MEMBER` | 認証ありのバックエンドAPIのURL |
+
+## 開発
+
+フロントエンド開発サーバーを起動するには、以下のコマンドを実行します。
+
+```shell
+npm run start:frontend
+```
+
+これにより、React開発サーバーが起動し、`http://localhost:3000` でアプリケーションにアクセスできます。
+
+## フロントエンドのビルド
+
+本番環境用にフロントエンドをビルドするには、以下のコマンドを実行します。
+
+```shell
+npm run build:frontend
+```
+
+ビルドされたファイルは `frontend/build` ディレクトリに出力されます。
+
+## テスト
+
+テストを実行するには、以下のコマンドを使用します。
+
+```shell
+# すべてのテストを実行
+npm test
+
+# フロントエンドのテストのみを実行
+npm run test:frontend
+
+# バックエンドのテストのみを実行
+npm run test:backend
 ```
