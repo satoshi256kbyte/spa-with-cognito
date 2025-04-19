@@ -29,6 +29,8 @@ const serviceName = config.serviceName || 'spa-cognito';
 const stageName = config.stageName || envName;
 const callbackUrls = config.callbackUrls || ['http://localhost:3000'];
 const logoutUrls = config.logoutUrls || ['http://localhost:3000'];
+const corsOrigins = config.corsOrigins || ['*'];
+const corsAllowCredentials = config.corsAllowCredentials || true;
 
 // スタックの作成
 new CdkProjectStack(app, `${serviceName}-${stageName}-stack`, {
@@ -50,4 +52,6 @@ new CdkProjectStack(app, `${serviceName}-${stageName}-stack`, {
   stageName: stageName,
   callbackUrls: callbackUrls,
   logoutUrls: logoutUrls,
+  corsOrigins: corsOrigins,
+  corsAllowCredentials: corsAllowCredentials,
 });
