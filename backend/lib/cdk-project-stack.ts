@@ -50,8 +50,8 @@ export class CdkProjectStack extends cdk.Stack {
     const resourceBase = `${serviceName}-${stageName}`;
 
     // CORS設定 - 確実に動作する固定値を使用
-    const corsOrigins = ['*']; // すべてのオリジンを許可
-    const corsAllowCredentials = true;
+    const corsOrigins = this.node.tryGetContext('corsOrigins') || props?.corsOrigins || ['*'];
+    const corsAllowCredentials = this.node.tryGetContext('corsAllowCredentials') || true;
 
     // Cognitoユーザープールの作成
     const userPool = new cognito.UserPool(this, 'SpaUserPool', {
@@ -109,7 +109,7 @@ export class CdkProjectStack extends cdk.Stack {
         CLIENT_ID: userPoolClient.userPoolClientId,
         SERVICE_NAME: serviceName,
         STAGE_NAME: stageName,
-        CORS_ORIGINS: JSON.stringify(corsOrigins),
+        CORS_ORIGINS: JSON.stringify(['*']),
         CORS_ALLOW_CREDENTIALS: corsAllowCredentials.toString(),
       },
     });
@@ -124,7 +124,7 @@ export class CdkProjectStack extends cdk.Stack {
         CLIENT_ID: userPoolClient.userPoolClientId,
         SERVICE_NAME: serviceName,
         STAGE_NAME: stageName,
-        CORS_ORIGINS: JSON.stringify(corsOrigins),
+        CORS_ORIGINS: JSON.stringify(['*']),
         CORS_ALLOW_CREDENTIALS: corsAllowCredentials.toString(),
       },
     });
@@ -134,7 +134,7 @@ export class CdkProjectStack extends cdk.Stack {
       apiName: `${resourceBase}-apigw-http-guest-api`,
       description: `Guest HTTP API for ${serviceName} (${stageName}) - No authentication required`,
       corsPreflight: {
-        allowOrigins: ['https://spa-with-cognito-frontend.vercel.app'], // フロントエンドのURLを明示的に指定
+        allowOrigins: corsOrigins,
         allowMethods: [httpApi.CorsHttpMethod.ANY], // すべてのメソッドを許可
         allowHeaders: ['*'], // すべてのヘッダーを許可
         allowCredentials: true,
@@ -160,7 +160,7 @@ export class CdkProjectStack extends cdk.Stack {
       apiName: `${resourceBase}-apigw-http-member-api`,
       description: `Member HTTP API for ${serviceName} (${stageName}) with Cognito authentication`,
       corsPreflight: {
-        allowOrigins: ['https://spa-with-cognito-frontend.vercel.app'], // フロントエンドのURLを明示的に指定
+        allowOrigins: corsOrigins,
         allowMethods: [httpApi.CorsHttpMethod.ANY], // すべてのメソッドを許可
         allowHeaders: ['*'], // すべてのヘッダーを許可
         allowCredentials: true,

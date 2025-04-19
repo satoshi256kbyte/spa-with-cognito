@@ -9,5 +9,9 @@
     "http://localhost:3000",
     "https://dev.example.com"
   ],
+  "corsOrigins":[
+    "http://localhost:3000",
+    "https://dev.example.com"
+  ],
   "corsAllowCredentials": true
 }
