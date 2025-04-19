@@ -7,19 +7,21 @@ import Login from './pages/Login';
 import Navigation from './components/Navigation';
 import PrivateRoute from './components/PrivateRoute';
 
-import { Auth, Hub } from 'aws-amplify';
+import { fetchAuthSession, signOut } from 'aws-amplify/auth';
+import { Hub } from 'aws-amplify/utils';
 import '@aws-amplify/ui-react/styles.css';
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const navigate = useNavigate();
 
+  // https://docs.amplify.aws/react/build-a-backend/auth/connect-your-frontend/manage-user-sessions/
   const checkAuthState = async () => {
     try {
-      await Auth.currentAuthenticatedUser();
-      setIsLoggedIn(true);
+      const { tokens } = await fetchAuthSession();
+      setIsLoggedIn(tokens !== undefined);
     } catch (error) {
-      console.log('Not authenticated', error);
+      console.log('Not signed in');
       setIsLoggedIn(false);
     }
   };
@@ -27,15 +29,9 @@ const App: React.FC = () => {
   useEffect(() => {
     checkAuthState();
 
+    // https://docs.amplify.aws/gen1/javascript/build-a-backend/utilities/hub/
     const listener = Hub.listen('auth', (data: { payload: { event: string } }) => {
-      switch (data.payload.event) {
-        case 'signIn':
-          checkAuthState();
-          break;
-        case 'signOut':
-          setIsLoggedIn(false);
-          break;
-      }
+      checkAuthState();
     });
 
     return () => listener();
@@ -47,7 +43,7 @@ const App: React.FC = () => {
 
   const handleSignOut = async () => {
     try {
-      await Auth.signOut();
+      await signOut();
       setIsLoggedIn(false);
     } catch (error) {
       console.log('Error signing out: ', error);

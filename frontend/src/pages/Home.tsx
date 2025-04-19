@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { fetchAuthSession } from 'aws-amplify/auth';
 import apiConfig from '../config/api-config';
 
 interface HomeProps {
@@ -61,20 +62,18 @@ const Home: React.FC<HomeProps> = ({ isLoggedIn, onSignIn, onSignOut }) => {
       try {
         console.info('HTTP API endpoint started');
         setMemberLoading(true);
-        
-        // Amplifyから現在のセッション情報を取得する
-        const { Auth } = await import('aws-amplify');
-        
+
         try {
-          const session = await Auth.currentSession();
-          const token = session.getIdToken().getJwtToken();
-          
+          // Amplify v6 method usage
+          const { tokens } = await fetchAuthSession();
+          const token = tokens?.idToken?.toString();
+
           if (!token) {
             throw new Error('No token available');
           }
 
           console.info('Token obtained from Amplify:', token ? 'Valid token' : 'No token');
-          
+
           const response = await fetch(apiConfig.endpoints.member, {
             headers: {
               Authorization: `Bearer ${token}`,

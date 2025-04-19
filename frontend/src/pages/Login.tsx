@@ -55,8 +55,17 @@ const Login: React.FC = () => {
         initialState="signIn"
         services={{
           handleSignUp: async formData => {
-            // デフォルトのサインアップを使用するため、formDataをそのまま返す
-            return formData;
+            return {
+              isSignUpComplete: false,
+              nextStep: {
+                signUpStep: 'CONFIRM_SIGN_UP',
+                codeDeliveryDetails: {
+                  deliveryMedium: 'EMAIL',
+                  destination: formData.username,
+                  attributeName: 'email',
+                },
+              },
+            };
           },
         }}
       >

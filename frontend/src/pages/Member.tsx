@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { fetchAuthSession } from 'aws-amplify/auth';
 import MemberProfile from './MemberProfile';
 import MemberSettings from './MemberSettings';
 import apiConfig from '../config/api-config';
@@ -30,12 +31,11 @@ const Member: React.FC<MemberProps> = ({ isLoggedIn }) => {
 
       try {
         setLoading(true);
-        // Amplifyから現在のセッション情報を取得する
-        const { Auth } = await import('aws-amplify');
+        // Amplify v6 import and method usage
 
         try {
-          const session = await Auth.currentSession();
-          const token = session.getIdToken().getJwtToken();
+          const { tokens } = await fetchAuthSession();
+          const token = tokens?.idToken?.toString();
 
           if (!token) {
             throw new Error('No token available');
