@@ -155,13 +155,6 @@ export class CdkProjectStack extends cdk.Stack {
       integration: guestHttpIntegration,
     });
 
-    // HTTP APIにエンドポイントを追加 - ゲスト用情報エンドポイント
-    guestHttpApi.addRoutes({
-      path: '/info',
-      methods: [httpApi.HttpMethod.GET],
-      integration: guestHttpIntegration,
-    });
-
     // HTTP API（APIGatewayV2）の作成 - メンバー用（CORS問題に対応）
     const memberHttpApi = new httpApi.HttpApi(this, 'MemberHttpApi', {
       apiName: `${resourceBase}-apigw-http-member-api`,
