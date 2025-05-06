@@ -5,9 +5,10 @@ import About from './pages/About';
 import Member from './pages/Member';
 import Login from './pages/Login';
 import Navigation from './components/Navigation';
-import PrivateRoute from './components/PrivateRoute';
+// import PrivateRoute from './components/PrivateRoute';
 
 import { fetchAuthSession, signOut } from 'aws-amplify/auth';
+import { Authenticator } from '@aws-amplify/ui-react';
 import { Hub } from 'aws-amplify/utils';
 import '@aws-amplify/ui-react/styles.css';
 
@@ -69,9 +70,9 @@ const App: React.FC = () => {
           <Route
             path="/member/*"
             element={
-              <PrivateRoute isLoggedIn={isLoggedIn}>
+              <Authenticator>
                 <Member isLoggedIn={isLoggedIn} />
-              </PrivateRoute>
+              </Authenticator>
             }
           />
         </Routes>
