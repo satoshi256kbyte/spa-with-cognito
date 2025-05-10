@@ -26,13 +26,22 @@ Actions:
           with:
             node-version: '18.x'
 
-        - name: Setup Node.js 17.x
+        - name: Setup Node.js 19.x
           uses: actions/setup-node@v3
           with:
-            node-version: '17.x'
+            node-version: '19.x'
   
-        - name: Setup Node.js 16.x
+        - name: Setup Node.js 20.x
           uses: actions/setup-node@v3
           with:
-            node-version: '16.x'
+            node-version: '20.x'
 
+        - name: Setup Node.js 21.x
+          uses: actions/setup-node@v3
+          with:
+            node-version: '21.x'
+
+        - name: Setup Node.js 22.x
+          uses: actions/setup-node@v3
+          with:
+            node-version: '22.x'
