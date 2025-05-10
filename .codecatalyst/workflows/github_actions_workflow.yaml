@@ -34,6 +34,4 @@ Actions:
         
         - name: Deploy backend
           run: npm run deploy:backend
-    Compute:
-      Type: EC2
-      Fleet: Linux.x86-64.Large
+
