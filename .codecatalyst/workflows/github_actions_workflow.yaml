@@ -21,14 +21,18 @@ Actions:
     Configuration:
       # Required - Steps are sequential instructions that run shell commands
       Steps:
-        - name: Setup Node.js 16.x
+        - name: Setup Node.js
           uses: actions/setup-node@v3
           with:
-            node-version: '16.x'
-                    
+            node-version: '20.11.1'
+
         - name: Install dependencies
           run: npm run install:backend
         
+        - nama: Create config file from sample
+          run: |
+            cp backend/config/dev.json.sample backend/config/dev.json
+
         - name: Deploy backend
           run: npm run deploy:backend
 
