@@ -29,7 +29,7 @@ Actions:
         - name: Install dependencies
           run: npm run install:backend
         
-        - nama: Create config file from sample
+        - name: Create config file from sample
           run: |
             cp backend/config/dev.json.sample backend/config/dev.json
 
