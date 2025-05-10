@@ -21,10 +21,19 @@ Actions:
     Configuration:
       # Required - Steps are sequential instructions that run shell commands
       Steps:
-        - name: Hello_world_action
-          uses: actions/hello-world-javascript-action@v1.1
-          with:
-            who-to-greet: Mona the Octocat
+        - name: Setup asdf
+          uses: asdf-vm/actions/setup@v2
+        
+        - name: Install asdf plugins and NodeJS
+          run: |
+            asdf plugin add nodejs || true
+            asdf install
+        
+        - name: Install dependencies
+          run: npm run install:backend
+        
+        - name: Deploy backend
+          run: npm run deploy:backend
     Compute:
       Type: EC2
       Fleet: Linux.x86-64.Large
